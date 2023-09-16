@@ -1,5 +1,5 @@
 // import models and modules
-const { User, Book } = require('../models');
+const { User } = require('../models');
 const { AuthenticationError } = require('apollo-server-express');
 const { signToken } = require('../utils/auth');
 
@@ -33,8 +33,8 @@ const resolvers = {
       const token = signToken(user); // generate JSON Web Token (JWT) for user
       return { token, user };
     },
-    addUser: async (parent, args) => {
-      const user = await User.create(args); // create new user based on provided arguments
+    addUser: async (parent, { username, email, password }) => {
+      const user = await User.create({ username, email, password }); // create new user based on provided arguments
       const token = signToken(user); // generate JWT for new user
       return { token, user };
     },

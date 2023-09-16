@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { useMutation } from '@apollo/client' // import Apollo Client hooks
 
@@ -16,11 +16,21 @@ const SignupForm = () => {
 
   const [addUser, { error }] = useMutation(ADD_USER); // use addUser GraphQL mutation
 
+  // effect to show/hide the rror alert based on the 'error' state
+  useEffect(() => {
+    if (error) {
+      setShowAlert(true); // display error alert
+    } else {
+      setShowAlert(false); // hide error alert
+    }
+  }, [error]);
+  
+  // handle input field changes and update 'userFormData'
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
-
+  // handles form submission
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
@@ -32,20 +42,16 @@ const SignupForm = () => {
     }
 
     try {
+      // call 'addUser' mutation with user data and get the response data
       const { data } = await addUser({
         variables: { ...userFormData },
       });
-
-      if (error) {
-        throw new Error('something went wrong!');
-      }
 
       // use Auth module to log in user
       Auth.login(data.addUser.token);
 
     } catch (err) {
       console.error(err);
-      setShowAlert(true);
     }
 
     setUserFormData({
